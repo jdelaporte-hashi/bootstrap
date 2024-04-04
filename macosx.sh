@@ -24,7 +24,11 @@ brew install visual-studio-code
 brew install neovim
 brew install csshx
 
-# After installing neovim, add /usr/local/bin/nvim to mac OSX path in VSCode.
+echo 'After installing neovim, add /usr/local/bin/nvim to mac OSX path in VSCode.'
+
+## For Docker
+brew upgrade
+brew install --cask docker
 
 
 ## For AWS CLI (and ROSA)
