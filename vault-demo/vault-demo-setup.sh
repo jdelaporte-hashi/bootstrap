@@ -3,7 +3,7 @@
 set -e
 
 if [ $# -eq 0 ] ;
-then echo "Run again with at least one argument for cluster name."
+then echo "Run again with at least one argument for cluster name, using Ocean, Sands, Orange, Grass, or Novel."
 fi
 
 declare -i portpin=0
@@ -31,8 +31,17 @@ do
         sed -i '' "s/8200/$api_port/g" ${config_dir}/server.hcl
         sed -i '' "s/8201/$cluster_port/g" ${config_dir}/server.hcl
 
-        #HOME=/Users/joani.delaporte
-        vault server -config $HOME/vault_cluster_configs/${clustername}&
+        ## Start the server in a new Terminal tab ##
+	    osascript <<'EOF'
+	    tell application "Terminal"
+		    do script ""
+		    set current settings of selected tab of window 1 to settings set "$clustername"
+		    set custom title of tab 1 of front window to "Server $clustername"
+		    do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
+	    end tell
+	EOF
+
+	## Wait for server to start up
         sleep 10
 
         echo "## Initialize $clustername cluster and send unseal keys to a file ##"
@@ -40,7 +49,17 @@ do
         vault operator init -address=${VAULT_ADDR} -key-shares=1 -key-threshold=1 | tee -a $HOME/secrets/vault-${clustername}.txt
 
         echo "## Unseal key(s) and root token for $clustername cluster ##"
-        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
+        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txtecho 'Hello World'
+
+	## Start a client session in a new Terminal tab ##
+	osascript <<'END'
+	tell application "Terminal"
+		do script ""
+		set current settings of selected tab of window 1 to settings set "$clustername"
+		set custom title of tab 1 of front window to "Client $clustername"
+	end tell
+	END
+
     fi
     shift
     portpin+=1
