@@ -3,13 +3,13 @@
 set -e
 
 if [ $# -eq 0 ] ;
-then echo "Run again with at least one argument for cluster name, using Ocean, Sands, Orange, Grass, or Novel."
+then echo "Run again with at least one argument for cluster name, using Ocean, Pro , Orange, Grass, or Novel."
 fi
 
 declare -i portpin=0
-while [ $# -gt 0 ] ;
+
+for clustername in $@;
 do
-    clustername="$1"
     config_dir=$HOME/vault_cluster_configs/${clustername}
     api_port="82${portpin}0"
     cluster_port="82${portpin}1"
@@ -32,14 +32,14 @@ do
         sed -i '' "s/8201/$cluster_port/g" ${config_dir}/server.hcl
 
         ## Start the server in a new Terminal tab ##
-	    osascript <<'EOF'
-	    tell application "Terminal"
-		    do script ""
-		    set current settings of selected tab of window 1 to settings set "$clustername"
-		    set custom title of tab 1 of front window to "Server $clustername"
-		    do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
-	    end tell
-	EOF
+        osascript <<END
+        tell application "Terminal"
+        do script ""
+            set current settings of selected tab of window 1 to settings set "$clustername"
+            set custom title of tab 1 of front window to "Server $clustername"
+            do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
+            end tell
+        END
 
 	## Wait for server to start up
         sleep 10
@@ -49,10 +49,10 @@ do
         vault operator init -address=${VAULT_ADDR} -key-shares=1 -key-threshold=1 | tee -a $HOME/secrets/vault-${clustername}.txt
 
         echo "## Unseal key(s) and root token for $clustername cluster ##"
-        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txtecho 'Hello World'
+        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
 
-	## Start a client session in a new Terminal tab ##
-	osascript <<'END'
+	## Start a client session in a new Terminal tab 
+	osascript <<END
 	tell application "Terminal"
 		do script ""
 		set current settings of selected tab of window 1 to settings set "$clustername"
@@ -67,5 +67,7 @@ done
 
 echo '## Proof in the P(s)udding ##'
 ps -ef | grep vault
-for f in $HOME/secrets/vault-*.txt; do head -n 6 $f; done | tee $HOME/secrets/vault-demo.txt
-wait
+for f in $HOME/secrets/vault-*.txt
+    do 
+    head -n 6 $f |  tee $HOME/secrets/vault-demo.txt
+    done
