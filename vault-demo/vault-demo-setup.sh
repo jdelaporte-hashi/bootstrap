@@ -17,7 +17,7 @@ do
 
     ## Check if Vault already running on this port
     ## TODO: Increment port if Vault already running on this port
-    if ! lsof -i :${api_port} ;
+    if ! lsof -i ":${api_port}";
     then    
         VAULT_ADDR="http://127.0.0.1:${api_port}"
         # Set up config directory
@@ -31,15 +31,14 @@ do
         sed -i '' "s/8200/$api_port/g" ${config_dir}/server.hcl
         sed -i '' "s/8201/$cluster_port/g" ${config_dir}/server.hcl
 
-        ## Start the server in a new Terminal tab ##
-        osascript <<END
-        tell application "Terminal"
-        do script ""
-            set current settings of selected tab of window 1 to settings set "$clustername"
-            set custom title of tab 1 of front window to "Server $clustername"
-            do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
-            end tell
-        END
+osascript << END
+tell application "Terminal"
+do script ""
+set current settings of selected tab of window 1 to settings set "$clustername"
+set custom title of tab 1 of front window to "Server $clustername"
+do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
+end tell
+END
 
 	## Wait for server to start up
         sleep 10
@@ -50,15 +49,16 @@ do
 
         echo "## Unseal key(s) and root token for $clustername cluster ##"
         head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
-
-	## Start a client session in a new Terminal tab 
-	osascript <<END
-	tell application "Terminal"
-		do script ""
-		set current settings of selected tab of window 1 to settings set "$clustername"
-		set custom title of tab 1 of front window to "Client $clustername"
-	end tell
-	END
+        
+        ## Start a client session in a new Terminal tab
+osascript << END
+tell application "Terminal"
+do script ""
+set current settings of selected tab of window 1 to settings set "$clustername"
+set custom title of tab 1 of front window to "Client $clustername"
+do script 'echo "Client session for ${clustername}&"' in front window
+end tell
+END
 
     fi
     shift
