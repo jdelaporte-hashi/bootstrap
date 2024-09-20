@@ -31,7 +31,7 @@ do
         sed -i '' "s/8200/$api_port/g" ${config_dir}/server.hcl
         sed -i '' "s/8201/$cluster_port/g" ${config_dir}/server.hcl
 
-echo "Start osascript"
+echo "osascript should open a terminal tab for vault server"
 osascript << END
 tell application "Terminal"
 do script ""
@@ -40,12 +40,7 @@ set custom title of tab 1 of front window to "Client $clustername"
 do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
 end tell
 END
-
-osascript -e 'tell application Terminal do script "" '
-osascript -e 'tell application Termanal to set current settings of selected tab of window 1 to settings set "$clustername" '
-osascript -e 'tell application Terminal to set custom title of tab 1 of front window to "Server $clustername" '
-osascript -e 'tell application Terminal to do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window'
-echo "Finished osascript"
+echo "Finished osascript for server ${clustername}"
 	## Wait for server to start up
         sleep 10
 
@@ -56,15 +51,24 @@ echo "Finished osascript"
         echo "## Unseal key(s) and root token for $clustername cluster ##"
         head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
         
-        ## Start a client session in a new Terminal tab
-osascript << END
+echo "Start a client session in a new Terminal tab"
+
+osascript << SIGH
 tell application "Terminal"
 do script ""
 set current settings of selected tab of window 1 to settings set "$clustername"
 set custom title of tab 1 of front window to "Client $clustername"
-do script 'echo "Client session for ${clustername}&"' in front window
+do script "echo 'client session for ${clustername}&'" in front window
 end tell
-END
+SIGH
+
+#tell application "Terminal"
+#do script ""
+#set current settings of selected tab of window 1 to settings set "$clustername"
+#set custom title of tab 1 of front window to "Client $clustername"
+#do script 'echo "Client session for ${clustername}&"' in front window
+#end tell
+echo "Done with osascript for client ${clustername}"
 
     fi
     shift
