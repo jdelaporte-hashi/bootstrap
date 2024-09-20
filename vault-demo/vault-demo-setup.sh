@@ -47,6 +47,8 @@ echo "Finished osascript for server ${clustername}"
         echo "## Initialize $clustername cluster and send unseal keys to a file ##"
         export VAULT_ADDR=$VAULT_ADDR
         vault operator init -address=${VAULT_ADDR} -key-shares=1 -key-threshold=1 | tee -a $HOME/secrets/vault-${clustername}.txt
+        #export VAULT_ROOT_TOKEN=$(cat $HOME/secrets/vault-${clustername}.txt | grep '^Initial' | awk '{print $4}')
+        #export VAULT_UNSEAL_KEY=$(cat $HOME/secrets/vault-${clustername}.txt | grep '^Unseal Key 1' | awk '{print $4}')
 
         echo "## Unseal key(s) and root token for $clustername cluster ##"
         head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
@@ -59,6 +61,11 @@ do script ""
 set current settings of selected tab of window 1 to settings set "$clustername"
 set custom title of tab 1 of front window to "Client $clustername"
 do script "echo 'client session for ${clustername}'" in front window
+do script "export VAULT_ROOT_TOKEN=$(cat $HOME/secrets/vault-${clustername}.txt | grep '^Initial' | awk '{print $4}')" in front window
+do script "export VAULT_UNSEAL_KEY=$(cat $HOME/secrets/vault-${clustername}.txt | grep '^Unseal Key 1' | awk '{print $4}')" in front window
+do script "export VAULT_ADDR=$VAULT_ADDR" in front window
+do script "vault operator unseal ${VAULT_UNSEAL_KEY}" in front window
+do script "vault token lookup" in front window
 end tell
 SIGH
 
