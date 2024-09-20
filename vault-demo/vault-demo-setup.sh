@@ -31,15 +31,21 @@ do
         sed -i '' "s/8200/$api_port/g" ${config_dir}/server.hcl
         sed -i '' "s/8201/$cluster_port/g" ${config_dir}/server.hcl
 
+echo "Start osascript"
 osascript << END
 tell application "Terminal"
 do script ""
 set current settings of selected tab of window 1 to settings set "$clustername"
-set custom title of tab 1 of front window to "Server $clustername"
+set custom title of tab 1 of front window to "Client $clustername"
 do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
 end tell
 END
 
+osascript -e 'tell application Terminal do script "" '
+osascript -e 'tell application Termanal to set current settings of selected tab of window 1 to settings set "$clustername" '
+osascript -e 'tell application Terminal to set custom title of tab 1 of front window to "Server $clustername" '
+osascript -e 'tell application Terminal to do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window'
+echo "Finished osascript"
 	## Wait for server to start up
         sleep 10
 
