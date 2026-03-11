@@ -51,7 +51,7 @@ echo "Finished osascript for server ${clustername}"
         #export VAULT_UNSEAL_KEY=$(cat $HOME/secrets/vault-${clustername}.txt | grep '^Unseal Key 1' | awk '{print $4}')
 
         echo "## Unseal key(s) and root token for $clustername cluster ##"
-        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee vault-demo.txt
+        head -n 3 $HOME/secrets/vault-${clustername}.txt | tee -a vault-demo.txt
         
 echo "Start a client session in a new Terminal tab"
 
@@ -86,5 +86,5 @@ echo '## Proof in the P(s)udding ##'
 ps -ef | grep vault
 for f in $HOME/secrets/vault-*.txt
     do 
-    head -n 6 $f |  tee $HOME/secrets/vault-demo.txt
+    head -n 6 $f |  tee -a $HOME/secrets/vault-demo.txt
     done

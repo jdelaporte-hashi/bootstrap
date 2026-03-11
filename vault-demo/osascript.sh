@@ -11,6 +11,7 @@ tell application "Terminal"
 do script ""
 set current settings of selected tab of window 1 to settings set "$clustername"
 set custom title of tab 1 of front window to "Client $clustername"
+do script "vault server -config $HOME/vault_cluster_configs/${clustername}&" in front window
 end tell
 END
 

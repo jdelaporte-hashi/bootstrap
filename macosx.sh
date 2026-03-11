@@ -57,7 +57,8 @@ brew install kubectl
 
 
 #For HashiCorp Terraform
-brew install terraform
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
 
 # For AWS CLI
 brew install awscli
@@ -73,6 +74,11 @@ brew install jq
 
 # For boundary
 brew tap hashicorp/security https://github.com/hashicorp/homebrew-security
-      brew install hashicorp/security/doormat-cli
-      brew update 
-      brew upgrade doormat-cli
+brew install hashicorp/security/doormat-cli
+brew update 
+brew upgrade doormat-cli
+
+# For docker and docker-desktop
+brew install docker
+brew install docker-desktop
+
